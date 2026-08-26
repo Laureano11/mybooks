@@ -37,6 +37,10 @@ export default function RootLayout({
             >
               Estadísticas
             </Link>
+            {/* En pantallas chicas el header no da abasto: la firma aparece desde sm. */}
+            <span className="ml-auto hidden whitespace-nowrap text-xs text-muted sm:inline">
+              by Laureano Enrique
+            </span>
           </nav>
         </header>
         <main className="mx-auto max-w-5xl px-5 py-8">{children}</main>
