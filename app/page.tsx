@@ -1,10 +1,11 @@
 import Link from "next/link";
-import { getBooks } from "@/lib/db";
+import { getBooks, type BookFilter } from "@/lib/db";
 import { BookCard } from "@/components/BookCard";
 import { STATUSES, type Status } from "@/lib/validation";
 
 const FILTERS: { value: string; label: string }[] = [
   { value: "", label: "Todos" },
+  { value: "joyitas", label: "💎 Joyitas" },
   { value: "leido", label: "Leídos" },
   { value: "leyendo", label: "Leyendo" },
   { value: "pendiente", label: "Pendientes" },
@@ -16,10 +17,13 @@ export default async function Home({
   searchParams: Promise<{ estado?: string }>;
 }) {
   const { estado } = await searchParams;
-  const status = STATUSES.includes(estado as Status)
-    ? (estado as Status)
-    : undefined;
-  const books = await getBooks(status);
+  const filter: BookFilter | undefined =
+    estado === "joyitas"
+      ? "joyitas"
+      : STATUSES.includes(estado as Status)
+        ? (estado as Status)
+        : undefined;
+  const books = await getBooks(filter);
 
   return (
     <>
@@ -44,7 +48,9 @@ export default async function Home({
 
       {books.length === 0 ? (
         <p className="py-16 text-center text-muted">
-          Todavía no hay libros acá.
+          {estado === "joyitas"
+            ? "Todavía no marcaste ninguna joyita."
+            : "Todavía no hay libros acá."}
         </p>
       ) : (
         <div className="grid grid-cols-2 gap-x-4 gap-y-7 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">

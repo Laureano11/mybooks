@@ -21,7 +21,8 @@ function readForm(formData: FormData): BookInput {
     rating: get("rating"),
     review: get("review"),
     status: get("status"),
-    finishedAt: get("finishedAt"),
+    finishedYear: get("finishedYear"),
+    gem: get("gem"),
   };
 }
 

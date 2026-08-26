@@ -58,7 +58,7 @@ export default async function StatsPage() {
       <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Tile label="Total" value={stats.total} />
         <Tile label="Leídos" value={stats.leidos} />
-        <Tile label="Leyendo" value={stats.leyendo} />
+        <Tile label="💎 Joyitas" value={stats.joyitas} />
         <Tile label="Promedio" value={stats.promedio ?? "—"} />
       </section>
 

@@ -9,7 +9,8 @@ export type BookInput = {
   rating: string;
   review: string;
   status: string;
-  finishedAt: string;
+  finishedYear: string;
+  gem: string;
 };
 
 /** Los datos ya validados y convertidos, listos para la base. */
@@ -20,7 +21,8 @@ export type BookValues = {
   rating: number | null;
   review: string | null;
   status: Status;
-  finishedAt: string | null;
+  finishedYear: number | null;
+  gem: boolean;
 };
 
 export type ValidationResult =
@@ -68,15 +70,26 @@ export function validateBook(input: BookInput): ValidationResult {
     }
   }
 
-  // Fecha: opcional, formato ISO.
-  let finishedAt: string | null = null;
-  const rawDate = input.finishedAt.trim();
-  if (rawDate) {
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(rawDate) || isNaN(Date.parse(rawDate))) {
-      errors.finishedAt = "La fecha debe tener el formato AAAA-MM-DD.";
+  // Año de lectura: opcional, cuatro dígitos dentro de un rango razonable.
+  let finishedYear: number | null = null;
+  const rawYear = input.finishedYear.trim();
+  if (rawYear) {
+    if (!/^\d{4}$/.test(rawYear)) {
+      errors.finishedYear = "El año debe tener cuatro dígitos.";
     } else {
-      finishedAt = rawDate;
+      const y = Number(rawYear);
+      if (y < 1900 || y > 2200) {
+        errors.finishedYear = "El año está fuera de rango.";
+      } else {
+        finishedYear = y;
+      }
     }
+  }
+
+  // La joyita distingue entre libros ya puntuados: sin nota no tiene sentido.
+  const gem = input.gem.trim() !== "";
+  if (gem && rating === null) {
+    errors.gem = "Para marcar la joyita el libro necesita una nota.";
   }
 
   // Un libro pendiente todavía no se leyó: no puede tener nota ni fecha de fin.
@@ -84,8 +97,8 @@ export function validateBook(input: BookInput): ValidationResult {
     if (rating !== null) {
       errors.rating = "Un libro pendiente no puede tener nota.";
     }
-    if (finishedAt !== null) {
-      errors.finishedAt = "Un libro pendiente no puede tener fecha de lectura.";
+    if (finishedYear !== null) {
+      errors.finishedYear = "Un libro pendiente no puede tener año de lectura.";
     }
   }
 
@@ -102,7 +115,8 @@ export function validateBook(input: BookInput): ValidationResult {
       rating,
       review: review || null,
       status: status as Status,
-      finishedAt,
+      finishedYear,
+      gem,
     },
   };
 }

@@ -13,7 +13,8 @@ export type Book = {
   rating: number | null;
   review: string | null;
   status: Status;
-  finished_at: string | null;
+  finished_year: number | null;
+  gem: boolean;
   created_at: string;
 };
 
@@ -55,12 +56,20 @@ function makeSql(): SqlTag {
 
 const sql = makeSql();
 
-export async function getBooks(status?: Status): Promise<Book[]> {
-  const rows = status
-    ? await sql`SELECT * FROM books WHERE status = ${status}
-                ORDER BY finished_at DESC NULLS LAST, created_at DESC`
-    : await sql`SELECT * FROM books
-                ORDER BY finished_at DESC NULLS LAST, created_at DESC`;
+/** Filtro de la home: por estado, o solo las joyitas. */
+export type BookFilter = Status | "joyitas";
+
+export async function getBooks(filter?: BookFilter): Promise<Book[]> {
+  // Los libros sin nota van al final: son los que todavía no puntué.
+  const rows =
+    filter === "joyitas"
+      ? await sql`SELECT * FROM books WHERE gem = true
+                  ORDER BY (rating IS NULL), finished_year DESC NULLS LAST, created_at DESC`
+      : filter
+        ? await sql`SELECT * FROM books WHERE status = ${filter}
+                    ORDER BY (rating IS NULL), finished_year DESC NULLS LAST, created_at DESC`
+        : await sql`SELECT * FROM books
+                    ORDER BY (rating IS NULL), finished_year DESC NULLS LAST, created_at DESC`;
   return rows as Book[];
 }
 
@@ -77,9 +86,10 @@ export async function getBookById(id: number): Promise<Book | null> {
 export async function createBook(values: BookValues): Promise<Book> {
   const slug = await freeSlug(values.title);
   const rows = await sql`
-    INSERT INTO books (slug, title, author, isbn, rating, review, status, finished_at)
+    INSERT INTO books (slug, title, author, isbn, rating, review, status, finished_year, gem)
     VALUES (${slug}, ${values.title}, ${values.author}, ${values.isbn},
-            ${values.rating}, ${values.review}, ${values.status}, ${values.finishedAt})
+            ${values.rating}, ${values.review}, ${values.status},
+            ${values.finishedYear}, ${values.gem})
     RETURNING *`;
   return rows[0] as Book;
 }
@@ -96,7 +106,8 @@ export async function updateBook(
       rating = ${values.rating},
       review = ${values.review},
       status = ${values.status},
-      finished_at = ${values.finishedAt}
+      finished_year = ${values.finishedYear},
+      gem = ${values.gem}
     WHERE id = ${id}
     RETURNING *`;
   return rows[0] as Book;
@@ -120,6 +131,7 @@ export type Stats = {
   leidos: number;
   leyendo: number;
   pendientes: number;
+  joyitas: number;
   promedio: number | null;
   porAnio: { anio: number; cantidad: number }[];
   histograma: { rating: number; cantidad: number }[];
@@ -132,18 +144,20 @@ export async function getStats(): Promise<Stats> {
       COUNT(*) FILTER (WHERE status = 'leido')::int AS leidos,
       COUNT(*) FILTER (WHERE status = 'leyendo')::int AS leyendo,
       COUNT(*) FILTER (WHERE status = 'pendiente')::int AS pendientes,
+      COUNT(*) FILTER (WHERE gem)::int AS joyitas,
       ROUND(AVG(rating)::numeric, 1) AS promedio
     FROM books`) as {
     total: number;
     leidos: number;
     leyendo: number;
     pendientes: number;
+    joyitas: number;
     promedio: string | null;
   }[];
 
   const porAnio = (await sql`
-    SELECT EXTRACT(YEAR FROM finished_at)::int AS anio, COUNT(*)::int AS cantidad
-    FROM books WHERE finished_at IS NOT NULL
+    SELECT finished_year AS anio, COUNT(*)::int AS cantidad
+    FROM books WHERE finished_year IS NOT NULL
     GROUP BY anio ORDER BY anio DESC`) as { anio: number; cantidad: number }[];
 
   const conteos = (await sql`
@@ -162,6 +176,7 @@ export async function getStats(): Promise<Stats> {
     leidos: totales.leidos,
     leyendo: totales.leyendo,
     pendientes: totales.pendientes,
+    joyitas: totales.joyitas,
     promedio: totales.promedio === null ? null : Number(totales.promedio),
     porAnio,
     histograma,

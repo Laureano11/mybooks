@@ -8,7 +8,8 @@ const base = {
   rating: "8",
   review: "Una reseña.",
   status: "leido",
-  finishedAt: "2026-03-14",
+  finishedYear: "2026",
+  gem: "",
 };
 
 function build(overrides: Partial<typeof base> = {}) {
@@ -21,7 +22,7 @@ describe("validateBook", () => {
     expect(result.ok).toBe(true);
     if (result.ok) {
       expect(result.value.rating).toBe(8);
-      expect(result.value.finishedAt).toBe("2026-03-14");
+      expect(result.value.finishedYear).toBe(2026);
     }
   });
 
@@ -55,7 +56,7 @@ describe("validateBook", () => {
 
   it("rechaza nota en un libro pendiente", () => {
     const result = validateBook(
-      build({ status: "pendiente", rating: "8", finishedAt: "" }),
+      build({ status: "pendiente", rating: "8", finishedYear: "" }),
     );
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.errors.rating).toBeDefined();
@@ -63,20 +64,20 @@ describe("validateBook", () => {
 
   it("rechaza fecha de lectura en un libro pendiente", () => {
     const result = validateBook(
-      build({ status: "pendiente", rating: "", finishedAt: "2026-03-14" }),
+      build({ status: "pendiente", rating: "", finishedYear: "2026" }),
     );
     expect(result.ok).toBe(false);
-    if (!result.ok) expect(result.errors.finishedAt).toBeDefined();
+    if (!result.ok) expect(result.errors.finishedYear).toBeDefined();
   });
 
   it("acepta un libro pendiente sin nota ni fecha", () => {
     const result = validateBook(
-      build({ status: "pendiente", rating: "", finishedAt: "", review: "" }),
+      build({ status: "pendiente", rating: "", finishedYear: "", review: "" }),
     );
     expect(result.ok).toBe(true);
     if (result.ok) {
       expect(result.value.rating).toBeNull();
-      expect(result.value.finishedAt).toBeNull();
+      expect(result.value.finishedYear).toBeNull();
     }
   });
 
@@ -110,8 +111,34 @@ describe("validateBook", () => {
     if (result.ok) expect(result.value.isbn).toBeNull();
   });
 
-  it("rechaza una fecha con formato inválido", () => {
-    expect(validateBook(build({ finishedAt: "14/03/2026" })).ok).toBe(false);
+  it("rechaza un año con formato inválido", () => {
+    expect(validateBook(build({ finishedYear: "14/03/2026" })).ok).toBe(false);
+    expect(validateBook(build({ finishedYear: "dos mil" })).ok).toBe(false);
+    expect(validateBook(build({ finishedYear: "26" })).ok).toBe(false);
+  });
+
+  it("rechaza un año fuera de rango razonable", () => {
+    expect(validateBook(build({ finishedYear: "1200" })).ok).toBe(false);
+    expect(validateBook(build({ finishedYear: "3000" })).ok).toBe(false);
+  });
+
+  it("acepta la joyita marcada", () => {
+    const result = validateBook(build({ gem: "on" }));
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.value.gem).toBe(true);
+  });
+
+  it("deja la joyita en false cuando la casilla viene vacía", () => {
+    const result = validateBook(build({ gem: "" }));
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.value.gem).toBe(false);
+  });
+
+  it("rechaza la joyita en un libro sin nota", () => {
+    // La joyita es una distinción entre libros ya leídos y puntuados.
+    const result = validateBook(build({ rating: "", gem: "on" }));
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.errors.gem).toBeDefined();
   });
 
   it("recorta los espacios de título y autor", () => {

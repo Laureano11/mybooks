@@ -12,7 +12,12 @@ export function BookCard({ book }: { book: Book }) {
   return (
     <Link href={`/libro/${book.slug}`} className="group block">
       <div className="transition-opacity group-hover:opacity-80">
-        <Cover isbn={book.isbn} title={book.title} author={book.author} />
+        <Cover
+          isbn={book.isbn}
+          title={book.title}
+          author={book.author}
+          gem={book.gem}
+        />
       </div>
       <div className="mt-2 flex items-baseline justify-between gap-2">
         <h2 className="truncate text-sm font-medium" title={book.title}>

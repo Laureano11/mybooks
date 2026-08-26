@@ -9,14 +9,6 @@ const STATUS_LABEL: Record<string, string> = {
   pendiente: "Pendiente",
 };
 
-function formatDate(iso: string): string {
-  return new Date(`${iso}T00:00:00`).toLocaleDateString("es-AR", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
-}
-
 export async function generateMetadata({
   params,
 }: {
@@ -38,7 +30,12 @@ export default async function BookPage({
   return (
     <article className="grid gap-8 sm:grid-cols-[200px_1fr]">
       <div>
-        <Cover isbn={book.isbn} title={book.title} author={book.author} />
+        <Cover
+          isbn={book.isbn}
+          title={book.title}
+          author={book.author}
+          gem={book.gem}
+        />
       </div>
 
       <div>
@@ -50,9 +47,9 @@ export default async function BookPage({
           <span className="text-sm uppercase tracking-wide text-muted">
             {STATUS_LABEL[book.status]}
           </span>
-          {book.finished_at && (
+          {book.finished_year && (
             <span className="text-sm text-muted">
-              Terminado el {formatDate(book.finished_at)}
+              Leído en {book.finished_year}
             </span>
           )}
         </div>

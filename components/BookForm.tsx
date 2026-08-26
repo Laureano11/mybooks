@@ -94,16 +94,36 @@ export function BookForm({ book }: { book?: Book }) {
             />
           </Field>
 
-          <Field label="Fecha de lectura" error={errors.finishedAt}>
+          <Field label="Año de lectura" error={errors.finishedYear}>
             <input
-              type="date"
-              name="finishedAt"
-              defaultValue={sent?.finishedAt ?? book?.finished_at ?? ""}
+              type="number"
+              name="finishedYear"
+              min={1900}
+              max={2200}
+              step={1}
+              inputMode="numeric"
+              placeholder="2026"
+              defaultValue={sent?.finishedYear ?? book?.finished_year ?? ""}
               className={FIELD}
             />
           </Field>
         </div>
       )}
+
+      {status !== "pendiente" && (
+        <label className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            name="gem"
+            defaultChecked={sent ? sent.gem !== "" : (book?.gem ?? false)}
+            className="size-4 accent-[var(--accent)]"
+          />
+          <span className="text-sm">
+            💎 Joyita <span className="text-muted">— de los muy buenos</span>
+          </span>
+        </label>
+      )}
+      {errors.gem && <p className="text-sm text-red-400">{errors.gem}</p>}
 
       <Field label="Reseña">
         <textarea

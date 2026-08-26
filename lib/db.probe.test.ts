@@ -24,7 +24,8 @@ describe("capa de datos (contra la base real)", () => {
       rating: 9,
       review: "Una reseña de prueba.",
       status: "leido",
-      finishedAt: "2026-03-14",
+      finishedYear: 2026,
+      gem: false,
     });
     ids.push(creado.id);
 
@@ -44,13 +45,14 @@ describe("capa de datos (contra la base real)", () => {
       rating: 10,
       review: "Reseña editada.",
       status: "leido",
-      finishedAt: "2026-03-15",
+      finishedYear: 2026,
+      gem: true,
     });
     expect(actualizado.rating).toBe(10);
     expect(actualizado.isbn).toBeNull();
   });
 
-  it("devuelve finished_at como string AAAA-MM-DD, no como Date", async () => {
+  it("guarda el año de lectura como número", async () => {
     const libro = await createBook({
       title: "Prueba de fecha",
       author: "X",
@@ -58,17 +60,15 @@ describe("capa de datos (contra la base real)", () => {
       rating: 5,
       review: null,
       status: "leido",
-      finishedAt: "2026-03-14",
+      finishedYear: 2026,
+      gem: false,
     });
     ids.push(libro.id);
 
-    // pg parsea DATE a Date en zona local (adelantaría/atrasaría un día);
-    // Neon devuelve el string. La app espera siempre el string.
-    expect(typeof libro.finished_at).toBe("string");
-    expect(libro.finished_at).toBe("2026-03-14");
+    expect(libro.finished_year).toBe(2026);
 
     const releido = await getBookById(libro.id);
-    expect(releido?.finished_at).toBe("2026-03-14");
+    expect(releido?.finished_year).toBe(2026);
   });
 
   it("desambigua slugs repetidos", async () => {
@@ -79,7 +79,8 @@ describe("capa de datos (contra la base real)", () => {
       rating: null,
       review: null,
       status: "pendiente",
-      finishedAt: null,
+      finishedYear: null,
+      gem: false,
     });
     const b = await createBook({
       title: "Libro De Prueba Dos",
@@ -88,7 +89,8 @@ describe("capa de datos (contra la base real)", () => {
       rating: null,
       review: null,
       status: "pendiente",
-      finishedAt: null,
+      finishedYear: null,
+      gem: false,
     });
     ids.push(a.id, b.id);
 
@@ -99,6 +101,77 @@ describe("capa de datos (contra la base real)", () => {
   it("filtra por estado", async () => {
     const pendientes = await getBooks("pendiente");
     expect(pendientes.every((b) => b.status === "pendiente")).toBe(true);
+  });
+
+  it("ordena los libros con nota antes que los que no la tienen", async () => {
+    const sinNota = await createBook({
+      title: "Sin Puntuar Todavia",
+      author: "X",
+      isbn: null,
+      rating: null,
+      review: null,
+      status: "leido",
+      // Año reciente: sin el orden nuevo, este libro se iría al tope.
+      finishedYear: 2026,
+      gem: false,
+    });
+    const conNota = await createBook({
+      title: "Puntuado Viejo",
+      author: "X",
+      isbn: null,
+      rating: 6,
+      review: null,
+      status: "leido",
+      finishedYear: 1990,
+      gem: false,
+    });
+    ids.push(sinNota.id, conNota.id);
+
+    const libros = await getBooks();
+    const posSinNota = libros.findIndex((b) => b.id === sinNota.id);
+    const posConNota = libros.findIndex((b) => b.id === conNota.id);
+    expect(posConNota).toBeLessThan(posSinNota);
+
+    // Y todos los puntuados van antes que cualquiera sin puntuar.
+    const primerSinNota = libros.findIndex((b) => b.rating === null);
+    if (primerSinNota !== -1) {
+      expect(libros.slice(primerSinNota).every((b) => b.rating === null)).toBe(
+        true,
+      );
+    }
+  });
+
+  it("filtra por joyitas", async () => {
+    const joya = await createBook({
+      title: "Una Joyita De Prueba",
+      author: "X",
+      isbn: null,
+      rating: 10,
+      review: null,
+      status: "leido",
+      finishedYear: 2026,
+      gem: true,
+    });
+    ids.push(joya.id);
+
+    const joyitas = await getBooks("joyitas");
+    expect(joyitas.every((b) => b.gem)).toBe(true);
+    expect(joyitas.some((b) => b.id === joya.id)).toBe(true);
+  });
+
+  it("la base rechaza una joyita sin nota", async () => {
+    await expect(
+      createBook({
+        title: "Joyita Invalida",
+        author: "X",
+        isbn: null,
+        rating: null,
+        review: null,
+        status: "leido",
+        finishedYear: null,
+        gem: true,
+      }),
+    ).rejects.toThrow();
   });
 
   it("calcula estadísticas", async () => {
@@ -119,7 +192,8 @@ describe("capa de datos (contra la base real)", () => {
         rating: 5,
         review: null,
         status: "pendiente",
-        finishedAt: null,
+        finishedYear: null,
+      gem: false,
       }),
     ).rejects.toThrow();
   });
