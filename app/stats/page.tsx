@@ -2,7 +2,7 @@ import { getStats } from "@/lib/db";
 
 function Tile({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="rounded-sm border border-border bg-surface px-4 py-3">
+    <div>
       <div className="text-2xl font-semibold">{value}</div>
       <div className="text-xs uppercase tracking-wide text-muted">{label}</div>
     </div>
@@ -38,7 +38,7 @@ function Bar({
   );
 }
 
-export const metadata = { title: "Estadísticas — mybooks" };
+export const metadata = { title: "Estadísticas — Lauri Books" };
 
 // Lee la base en cada request: si no, el build congelaría los números.
 export const dynamic = "force-dynamic";
@@ -58,7 +58,7 @@ export default async function StatsPage() {
       <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Tile label="Total" value={stats.total} />
         <Tile label="Leídos" value={stats.leidos} />
-        <Tile label="💎 Joyitas" value={stats.joyitas} />
+        <Tile label="Joyitas" value={stats.joyitas} />
         <Tile label="Promedio" value={stats.promedio ?? "—"} />
       </section>
 

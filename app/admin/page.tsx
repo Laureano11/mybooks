@@ -3,7 +3,7 @@ import { getBooks } from "@/lib/db";
 import { logoutAction } from "./actions";
 import { DeleteBook } from "@/components/DeleteBook";
 
-export const metadata = { title: "Admin — mybooks" };
+export const metadata = { title: "Admin — Lauri Books" };
 
 // Lee la base en cada request: si no, el build congelaría la lista.
 export const dynamic = "force-dynamic";

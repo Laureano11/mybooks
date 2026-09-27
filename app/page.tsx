@@ -5,7 +5,7 @@ import { STATUSES, type Status } from "@/lib/validation";
 
 const FILTERS: { value: string; label: string }[] = [
   { value: "", label: "Todos" },
-  { value: "joyitas", label: "💎 Joyitas" },
+  { value: "joyitas", label: "Joyitas" },
   { value: "leido", label: "Leídos" },
   { value: "leyendo", label: "Leyendo" },
   { value: "pendiente", label: "Pendientes" },
@@ -27,17 +27,17 @@ export default async function Home({
 
   return (
     <>
-      <div className="mb-6 flex flex-wrap gap-2">
+      <div className="mb-8 flex flex-wrap gap-x-5 gap-y-2">
         {FILTERS.map((f) => {
           const active = (estado ?? "") === f.value;
           return (
             <Link
               key={f.value}
               href={f.value ? `/?estado=${f.value}` : "/"}
-              className={`rounded-full border px-3 py-1 text-sm transition-colors ${
+              className={`text-sm transition-colors ${
                 active
-                  ? "border-accent bg-accent text-background"
-                  : "border-border text-muted hover:text-foreground"
+                  ? "text-foreground underline decoration-accent underline-offset-8"
+                  : "text-muted hover:text-foreground"
               }`}
             >
               {f.label}

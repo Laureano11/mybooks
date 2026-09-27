@@ -1,6 +1,6 @@
 import { BookForm } from "@/components/BookForm";
 
-export const metadata = { title: "Nuevo libro — mybooks" };
+export const metadata = { title: "Nuevo libro — Lauri Books" };
 
 export default function NewBookPage() {
   return (

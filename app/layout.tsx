@@ -10,7 +10,7 @@ const serif = Source_Serif_4({
 });
 
 export const metadata: Metadata = {
-  title: "mybooks",
+  title: "Lauri Books",
   description: "Mis libros, mis reseñas.",
 };
 
@@ -24,9 +24,9 @@ export default function RootLayout({
           <nav className="mx-auto flex max-w-5xl items-baseline gap-6 px-5 py-5">
             <Link
               href="/"
-              className="text-lg font-semibold tracking-tight hover:text-accent"
+              className="font-serif text-lg tracking-tight hover:text-accent"
             >
-              mybooks
+              Lauri Books
             </Link>
             <Link href="/" className="text-sm text-muted hover:text-foreground">
               Libros

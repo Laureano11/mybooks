@@ -15,8 +15,8 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }) {
   const book = await getBookBySlug((await params).slug);
-  if (!book) return { title: "Libro no encontrado — mybooks" };
-  return { title: `${book.title} — mybooks` };
+  if (!book) return { title: "Libro no encontrado — Lauri Books" };
+  return { title: `${book.title} — Lauri Books` };
 }
 
 export default async function BookPage({
