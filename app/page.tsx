@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getBooks, type BookFilter } from "@/lib/db";
-import { BookCard } from "@/components/BookCard";
+import { Shelf } from "@/components/shelf/Shelf";
 import { STATUSES, type Status } from "@/lib/validation";
 
 const FILTERS: { value: string; label: string }[] = [
@@ -25,40 +25,55 @@ export default async function Home({
         : undefined;
   const books = await getBooks(filter);
 
-  return (
-    <>
-      <div className="mb-8 flex flex-wrap gap-x-5 gap-y-2">
-        {FILTERS.map((f) => {
-          const active = (estado ?? "") === f.value;
-          return (
+  const filters = FILTERS.map((f) => ({
+    href: f.value ? `/?estado=${f.value}` : "/",
+    label: f.label,
+    active: (estado ?? "") === f.value,
+  }));
+
+  if (books.length === 0) {
+    return (
+      <>
+        <div className="mb-8 flex flex-wrap gap-x-5 gap-y-2">
+          {filters.map((f) => (
             <Link
-              key={f.value}
-              href={f.value ? `/?estado=${f.value}` : "/"}
+              key={f.href}
+              href={f.href}
               className={`text-sm transition-colors ${
-                active
+                f.active
                   ? "text-foreground underline decoration-accent underline-offset-8"
                   : "text-muted hover:text-foreground"
               }`}
             >
               {f.label}
             </Link>
-          );
-        })}
-      </div>
-
-      {books.length === 0 ? (
+          ))}
+        </div>
         <p className="py-16 text-center text-muted">
           {estado === "joyitas"
             ? "Todavía no marcaste ninguna joyita."
             : "Todavía no hay libros acá."}
         </p>
-      ) : (
-        <div className="grid grid-cols-2 gap-x-4 gap-y-7 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-          {books.map((book) => (
-            <BookCard key={book.id} book={book} />
-          ))}
-        </div>
-      )}
-    </>
+      </>
+    );
+  }
+
+  // El key reinicia la escena (y su animación de entrada) al cambiar de filtro.
+  return (
+    <Shelf
+      key={estado ?? ""}
+      filters={filters}
+      books={books.map((b) => ({
+        id: b.id,
+        slug: b.slug,
+        title: b.title,
+        author: b.author,
+        rating: b.rating,
+        review: b.review,
+        status: b.status,
+        finishedYear: b.finished_year,
+        gem: b.gem,
+      }))}
+    />
   );
 }
