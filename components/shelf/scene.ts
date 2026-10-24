@@ -483,6 +483,9 @@ export class HardbackScene {
       : { x: -1.25, y: -1.5, z: 2.4 };
     const shelfDrop = isOpenPhase ? easeInOutCubic(smoothstep(open, 0.05, 0.95)) : 0;
     const baseShadow = 0.85;
+    // En mobile la cámara mira más arriba mientras se navega, así el estante baja y no
+    // choca con el título; al abrir vuelve al encuadre original del libro abierto.
+    this.camera.lookAt(0, this.isMobile ? lerp(0.3, -0.4, shelfDrop) : -0.4, 0);
 
     this.rigs.forEach((rig, i) => {
       const { group, pivot, book } = rig;
