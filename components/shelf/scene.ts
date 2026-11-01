@@ -49,6 +49,8 @@ type Tween = {
 };
 
 const SHELF_Y = -3.1;
+/** Borde trasero de la mesa dibujada en shelf.css: detrás de él no se proyectan sombras. */
+const TABLE_BACK_Z = -1.9;
 const COVER_OPEN_ANGLE = 0.8 * Math.PI;
 const PANEL_DELAY = 1.332;
 
@@ -240,11 +242,12 @@ export class HardbackScene {
     this.scene.add(ambient, key, fill, bounce);
 
     this.ground = new THREE.Mesh(
-      new THREE.PlaneGeometry(60, 30),
+      new THREE.PlaneGeometry(60, 20),
       new THREE.ShadowMaterial({ transparent: true, color: "#000000" }),
     );
     this.ground.rotation.x = -Math.PI / 2;
     this.ground.position.y = SHELF_Y + 0.0005;
+    this.ground.position.z = TABLE_BACK_Z + 10;
     this.ground.receiveShadow = true;
     this.scene.add(this.ground);
 

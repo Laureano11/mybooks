@@ -1,7 +1,6 @@
 import Link from "next/link";
-import { getBooks, type BookFilter } from "@/lib/db";
+import { getBooks, STATUSES, type BookFilter, type Status } from "@/lib/books";
 import { Shelf } from "@/components/shelf/Shelf";
-import { STATUSES, type Status } from "@/lib/validation";
 
 const FILTERS: { value: string; label: string }[] = [
   { value: "", label: "Todos" },
@@ -23,7 +22,7 @@ export default async function Home({
       : STATUSES.includes(estado as Status)
         ? (estado as Status)
         : undefined;
-  const books = await getBooks(filter);
+  const books = getBooks(filter);
 
   const filters = FILTERS.map((f) => ({
     href: f.value ? `/?estado=${f.value}` : "/",
@@ -64,7 +63,6 @@ export default async function Home({
       key={estado ?? ""}
       filters={filters}
       books={books.map((b) => ({
-        id: b.id,
         slug: b.slug,
         title: b.title,
         author: b.author,

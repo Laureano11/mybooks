@@ -7,7 +7,6 @@ type Props = {
   isbn: string | null;
   title: string;
   author: string;
-  size?: "M" | "L";
   gem?: boolean;
 };
 
@@ -15,9 +14,9 @@ type Props = {
  * Portada de Open Library. Si no hay ISBN, o la imagen no existe,
  * cae en un recuadro tipográfico — un estado previsto, no un error.
  */
-export function Cover({ isbn, title, author, size = "L", gem = false }: Props) {
+export function Cover({ isbn, title, author, gem = false }: Props) {
   const [failed, setFailed] = useState(false);
-  const url = coverUrl(isbn, size);
+  const url = coverUrl(isbn);
   // La joyita se marca con borde dorado y un 💎 en la esquina.
   const marco = gem ? "border-accent" : "border-border";
 

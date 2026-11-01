@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Status
 
-This project is currently empty. Update this file as the codebase evolves.
+Sitio de reseñas en Next.js, sin base de datos: los libros viven en `data/books.json` (ver README).
 # CLAUDE.md
 
 Behavioral guidelines to reduce common LLM coding mistakes. Merge with project-specific instructions as needed.

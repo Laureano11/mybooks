@@ -1,8 +1,8 @@
 import * as THREE from "three";
 import type { Book3D as Book } from "./books";
 
-export const SERIF = '"Playfair Display", "Cormorant Garamond", Georgia, "Times New Roman", serif';
-export const SANS = '"Helvetica Neue", Helvetica, Arial, sans-serif';
+const SERIF = '"Playfair Display", "Cormorant Garamond", Georgia, "Times New Roman", serif';
+const SANS = '"Helvetica Neue", Helvetica, Arial, sans-serif';
 
 const INK = "#3a2a14";
 

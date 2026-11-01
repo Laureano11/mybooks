@@ -1,4 +1,4 @@
-import { getStats } from "@/lib/db";
+import { getStats } from "@/lib/books";
 
 function Tile({ label, value }: { label: string; value: string | number }) {
   return (
@@ -40,11 +40,8 @@ function Bar({
 
 export const metadata = { title: "Estadísticas — Lauri Books" };
 
-// Lee la base en cada request: si no, el build congelaría los números.
-export const dynamic = "force-dynamic";
-
-export default async function StatsPage() {
-  const stats = await getStats();
+export default function StatsPage() {
+  const stats = getStats();
 
   if (stats.total === 0) {
     return <p className="py-16 text-center text-muted">Todavía no hay datos.</p>;

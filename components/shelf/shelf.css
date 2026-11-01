@@ -36,7 +36,6 @@
 
 .hardback-root {
   --hb-fg: #fafafa;
-  --hb-bg: #0a0a0a;
   --hb-serif: "Cormorant Garamond", Georgia, serif;
   --hb-sans: "Hardback Geist", ui-sans-serif, system-ui, sans-serif;
   --hb-subtitle: rgba(245, 239, 226, 0.55);
@@ -54,7 +53,7 @@
   user-select: none;
   -webkit-user-select: none;
   touch-action: pan-y;
-  background-color: #1a130a;
+  background-color: #171717;
   color: var(--hb-fg);
   font-family: var(--hb-sans);
   -webkit-font-smoothing: antialiased;
@@ -64,31 +63,44 @@
 }
 
 .hb-bg,
-.hb-vignette,
 .hb-canvas,
 .hb-overlay {
   position: absolute;
   inset: 0;
 }
+/* Mesa negra contra una pared lisa, sin luces de ambiente: lo único iluminado son los libros.
+   El borde trasero se ubica detrás del plano donde apoyan los libros (TABLE_BACK_Z en scene.ts). */
 .hb-bg {
+  --hb-table-back: 72%;
+  --hb-table-edge: 7%;
   pointer-events: none;
-  background-size: cover;
-  background-position: center bottom;
-  background-repeat: no-repeat;
-  opacity: 0;
-  transition: opacity 600ms ease;
+  background-color: #171717;
 }
-.hb-bg {
-  opacity: 1;
+.hb-bg::before,
+.hb-bg::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
-.hb-vignette {
-  pointer-events: none;
-  background: radial-gradient(ellipse 130% 130% at 50% 50%, rgba(0, 0, 0, 0) 60%, rgba(0, 0, 0, 0.32) 100%);
-  animation: hb-breathe 5.5s ease-in-out infinite alternate;
+.hb-bg::before {
+  top: var(--hb-table-back);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  background-color: #0c0c0d;
+  /* Veta de fresno teñido: ruido muy estirado a lo ancho. */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1600' height='400'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.0015 .14' numOctaves='2' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .2 -.07'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
 }
-@keyframes hb-breathe {
-  to {
-    opacity: 0.88;
+.hb-bg::after {
+  height: var(--hb-table-edge);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  background-color: #050505;
+}
+/* En mobile la cámara mira más arriba mientras se navega y el estante queda más abajo. */
+@media (max-width: 767px) {
+  .hb-bg {
+    --hb-table-back: 81%;
+    --hb-table-edge: 4%;
   }
 }
 
@@ -161,10 +173,9 @@
 .hb-subtitle {
   margin: 20px 0 0;
   max-width: 44rem;
-  font-family: var(--hb-serif);
-  font-style: italic;
+  font-family: var(--hb-sans);
   font-weight: 400;
-  font-size: clamp(15px, 1.18vw, 19px);
+  font-size: clamp(14px, 1vw, 16px);
   line-height: 1.6;
   color: var(--hb-subtitle);
   animation: hb-rise-14 0.65s var(--hb-power3-out) 1.6s both;
@@ -226,7 +237,7 @@
   }
 }
 
-/* ---- buy panel ---- */
+/* ---- panel de la reseña ---- */
 .hb-panel {
   position: absolute;
   top: 45vh;
@@ -263,7 +274,7 @@
   .hb-panel .hb-panel-content {
     min-height: 55vh;
     padding: 28px 6vw 48px;
-    background: linear-gradient(to bottom, rgba(20, 13, 7, 0) 0, rgba(20, 13, 7, 0.94) 40px);
+    background: linear-gradient(to bottom, rgba(23, 23, 23, 0) 0, rgba(23, 23, 23, 0.94) 40px);
   }
   .hb-overlay-inner {
     padding-top: 5vh;
@@ -384,16 +395,6 @@
   font-size: clamp(15px, 1.05vw, 17px);
   line-height: 1.55;
   opacity: 0.8;
-}
-.hb-panel-quote {
-  margin: 24px 0 0;
-  padding-left: 16px;
-  border-left: 1px solid color-mix(in srgb, currentColor 25%, transparent);
-  font-family: var(--hb-serif);
-  font-style: italic;
-  font-size: clamp(13.5px, 0.95vw, 15.5px);
-  line-height: 1.5;
-  opacity: 0.75;
 }
 .hb-esc {
   display: none;

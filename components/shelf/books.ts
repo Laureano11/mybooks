@@ -1,8 +1,7 @@
-import type { Status } from "@/lib/validation";
+import type { Status } from "@/lib/books";
 
-/** Lo que el estante necesita de cada libro de la base. */
+/** Lo que el estante necesita de cada libro. */
 export type ShelfBook = {
-  id: number;
   slug: string;
   title: string;
   author: string;

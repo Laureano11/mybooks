@@ -1,42 +1,55 @@
 # mybooks
 
-Página donde hago reseñas de mis libros. Pública para leer, privada para cargar.
+Página donde hago reseñas de mis libros. Los libros viven en `data/books.json`.
 
 ## Cómo correrlo en local
 
-Necesitás Node 20+ y un Postgres corriendo.
+Necesitás Node 20+.
 
 ```bash
-createdb mybooks_dev
-psql -d mybooks_dev -f db/schema.sql
-cp .env.example .env.local   # completá las tres variables
 npm install
 npm run dev
 ```
 
-Para `SESSION_SECRET`:
+## Cómo cargar un libro
 
-```bash
-node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+Agregalo en `data/books.json` y hacé `git push`; Vercel publica el cambio.
+
+```json
+{
+  "slug": "rayuela",
+  "title": "Rayuela",
+  "author": "Julio Cortázar",
+  "isbn": "9788437604572",
+  "rating": 9,
+  "review": "Mi reseña.\n\nOtro párrafo.",
+  "status": "leido",
+  "finished_year": 2024,
+  "gem": true
+}
 ```
+
+- `slug` es la URL del libro y define su color en el estante: no lo cambies después.
+- `status` es `leido`, `leyendo` o `pendiente`. Un pendiente lleva `rating` y `finished_year` en `null`.
+- `gem` (joyita) necesita `rating`. `isbn`, `rating`, `review` y `finished_year` pueden ser `null`.
+- Entre libros con el mismo año, el que está más arriba en el archivo aparece primero.
+
+Si el archivo tiene un error, `npm run build` falla y dice qué libro corregir.
 
 ## Comandos
 
 | Comando | Qué hace |
 |---|---|
 | `npm run dev` | Servidor de desarrollo |
-| `npm test` | Tests (algunos necesitan la base) |
+| `npm test` | Tests |
 | `npm run build` | Build de producción |
 | `npx eslint .` | Lint |
 
 ## Cómo funciona
 
-- **Next.js 16** (App Router). Las páginas leen la base directamente; las escrituras van por Server Actions.
-- **Postgres**, una sola tabla `books`. En local se usa el driver `pg`; en producción, el de Neon por HTTP. `lib/db.ts` elige según la URL.
+- **Next.js 16** (App Router). Las páginas leen los libros con `lib/books.ts`, que valida `data/books.json`.
 - **Las portadas no se guardan**: se derivan del ISBN vía Open Library. Sin ISBN, o si la imagen no existe, se muestra un recuadro con el título.
-- **La sesión** es una cookie firmada con HMAC (`lib/session.ts`), sin estado en el servidor. `proxy.ts` filtra la navegación a `/admin`, y además cada Server Action revalida la sesión por su cuenta.
 
 ## Deploy
 
-Las variables que hay que configurar en Vercel: `DATABASE_URL`, `ADMIN_PASSWORD` y `SESSION_SECRET`.
-Después del primer deploy, aplicar `db/schema.sql` sobre la base de producción.
+Vercel, sin variables de entorno.

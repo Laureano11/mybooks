@@ -8,10 +8,6 @@ describe("coverUrl", () => {
     );
   });
 
-  it("acepta un tamaño distinto", () => {
-    expect(coverUrl("9788437604947", "M")).toContain("-M.jpg");
-  });
-
   it("devuelve null sin ISBN", () => {
     expect(coverUrl(null)).toBeNull();
     expect(coverUrl("")).toBeNull();

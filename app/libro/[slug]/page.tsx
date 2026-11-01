@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getBookBySlug } from "@/lib/db";
+import { getBookBySlug } from "@/lib/books";
 import { Cover } from "@/components/Cover";
 import { RatingBadge } from "@/components/RatingBadge";
 
@@ -14,7 +14,7 @@ export async function generateMetadata({
 }: {
   params: Promise<{ slug: string }>;
 }) {
-  const book = await getBookBySlug((await params).slug);
+  const book = getBookBySlug((await params).slug);
   if (!book) return { title: "Libro no encontrado — Lauri Books" };
   return { title: `${book.title} — Lauri Books` };
 }
@@ -24,7 +24,7 @@ export default async function BookPage({
 }: {
   params: Promise<{ slug: string }>;
 }) {
-  const book = await getBookBySlug((await params).slug);
+  const book = getBookBySlug((await params).slug);
   if (!book) notFound();
 
   return (
@@ -43,7 +43,7 @@ export default async function BookPage({
         <p className="mt-1 text-lg text-muted">{book.author}</p>
 
         <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2">
-          <RatingBadge rating={book.rating} large />
+          <RatingBadge rating={book.rating} />
           <span className="text-sm uppercase tracking-wide text-muted">
             {STATUS_LABEL[book.status]}
           </span>

@@ -12,8 +12,8 @@ type Props = {
 };
 
 const TITLE: { text: string; italic: boolean }[] = [
-  { text: "Estantería", italic: false },
-  { text: " de Lauri", italic: true },
+  { text: "Lauri", italic: false },
+  { text: " books", italic: true },
 ];
 const TITLE_LENGTH = TITLE.reduce((n, part) => n + part.text.length, 0);
 
@@ -97,8 +97,7 @@ export function Shelf({ books: rawBooks, filters }: Props) {
       data-pointer={state.pointer}
       aria-label="Estante 3D de libros"
     >
-      <div className="hb-bg" style={{ backgroundImage: "url(/shelf/books-bg.png)" }} />
-      <div className="hb-vignette" />
+      <div className="hb-bg" />
       <div ref={canvasRef} className="hb-canvas" />
 
       <div className="hb-overlay" data-visible={overlayVisible}>
