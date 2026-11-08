@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Source_Serif_4 } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 const sans = Inter({ subsets: ["latin"], variable: "--font-sans-app" });
@@ -20,6 +21,7 @@ export default function RootLayout({
     <html lang="es" className={`${sans.variable} ${serif.variable}`}>
       <body className="min-h-screen">
         <main className="mx-auto max-w-5xl px-5 py-8">{children}</main>
+        <Analytics />
       </body>
     </html>
   );
